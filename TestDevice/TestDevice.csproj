@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="MyCommunicationClient.cs" />
     <Compile Include="MyCommunicationClientFactory.cs" />
+    <Compile Include="MyExceptionHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

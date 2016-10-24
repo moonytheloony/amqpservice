@@ -14,13 +14,13 @@
     {
         readonly string address;
 
+        readonly string replyTo;
+
         Connection connection;
 
         int offset;
 
         ReceiverLink receiver;
-
-        readonly string replyTo;
 
         SenderLink sender;
 
@@ -32,6 +32,11 @@
             this.replyTo = "client-" + Guid.NewGuid();
         }
 
+        public ResolvedServiceEndpoint Endpoint { get; set; }
+
+        public string ListenerName { get; set; }
+
+        public ResolvedServicePartition ResolvedServicePartition { get; set; }
 
         public Task<object> Run()
         {
@@ -62,10 +67,10 @@
         void RunOnce()
         {
             var request = new Message("hello " + this.offset)
-            {
-                Properties = new Properties { MessageId = "command-request", ReplyTo = this.replyTo },
-                ApplicationProperties = new ApplicationProperties { ["offset"] = this.offset }
-            };
+                {
+                    Properties = new Properties { MessageId = "command-request", ReplyTo = this.replyTo },
+                    ApplicationProperties = new ApplicationProperties { ["offset"] = this.offset }
+                };
             this.sender.Send(request, null, null);
             Console.WriteLine($"Sent request {request.Properties} body {request.Body}");
 
@@ -85,19 +90,14 @@
             this.connection = new Connection(new Address(this.address));
             this.session = new Session(this.connection);
             var recvAttach = new Attach
-            {
-                Source = new Source { Address = "request_processor" },
-                Target = new Target { Address = this.replyTo }
-            };
+                {
+                    Source = new Source { Address = "request_processor" },
+                    Target = new Target { Address = this.replyTo }
+                };
 
             this.receiver = new ReceiverLink(this.session, "request-client-receiver", recvAttach, null);
             this.receiver.Start(300);
             this.sender = new SenderLink(this.session, "request-client-sender", "request_processor");
         }
-        public ResolvedServiceEndpoint Endpoint { get; set; }
-
-        public string ListenerName { get; set; }
-
-        public ResolvedServicePartition ResolvedServicePartition { get; set; }
     }
 }

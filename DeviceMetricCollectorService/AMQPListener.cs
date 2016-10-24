@@ -46,7 +46,7 @@
         {
             var serviceEndpoint = this.context.CodePackageActivationContext.GetEndpoint("AMQPEndpoint");
             var port = serviceEndpoint.Port;
-            this.listeningAddress = string.Format(CultureInfo.InvariantCulture, "amqp://guest:guest@+:{0}", port);
+            this.listeningAddress = string.Format(CultureInfo.InvariantCulture, "amqp://guest:guest@+:{0}/{1}/{2}", port, this.context.PartitionId, this.context.ReplicaId);
             this.publishAddress = this.listeningAddress.Replace("+", FabricRuntime.GetNodeContext().IPAddressOrFQDN);
             var addressUri = new Uri(this.publishAddress);
             this.host = new ContainerHost(new[] { addressUri }, null, addressUri.UserInfo);
